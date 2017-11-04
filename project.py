@@ -94,21 +94,22 @@ def login():
 #Register page
 @app.route('/register', methods = ['GET', 'POST'])
 def register():
-    if request.method == 'POST':
+    if request.method == 'GET':
+        return render_template('register.html')
+    elif request.method == 'POST':
+        print "ggg ex"
         usernameInp = request.form['username']
         nameInp = request.form['name']
         emailInp = request.form['email']
         passwordInp = request.form['password']
         confpasswordInp = request.form['confirm_password']
         universityInp = request.form['university']
-
         if  usernameInp == '' or passwordInp == '' or emailInp == '' or universityInp == '':
             return generateResponse('Empty input field', 401) 
         elif confpasswordInp != passwordInp:
             return generateResponse('Confirm password does not match', 401) 
-
         university = getUniInfoByName(universityInp)
-        student = getStudentInfoByUsername(usernameInput)
+        student = getStudentInfoByUsername(usernameInp)
         studentEmail = getStudentInfoByEmail(emailInp)
 
         if student != None:

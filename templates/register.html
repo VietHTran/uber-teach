@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="look">
+
+    <div class="ui middle alogned center aligned grid">
+        <h2>Register</h2>
+        <form class="ui form" method="post" action="#">
+            <div class="field">
+                <label>Username: </label>
+                <input name="username" placeholder="Username" type="text">
+            </div>
+            <div class="field">
+                <label>Full Name: </label>
+                <input name="name" placeholder="Full Name" type="text">
+            </div>
+            <div class="field">
+                <label>Password: </label>
+                <input name="password" placeholder="Password" type="password">
+            </div>
+            <div class="field">
+                <label>Confirm Password: </label>
+                <input name="confirm_password" placeholder="Confirm Password" type="password">
+            </div>
+            <div class="field">
+                <label>University: </label>
+                <input name="university" placeholder="University" type="text">
+            </div>
+            <div class = "field">
+                <label>Email: </label>
+                <input type="email" name="email" placeholder="abcd@*.com">
+            </div>
+            <button class="ui button" type="submit">Submit</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
