@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Restaurant, MenuItem, User
+from database_setup import Base, University, Course, Student, Transaction, HelpRequest, Enrollment
 import random, string
 
 from oauth2client.client import flow_from_clientsecrets
@@ -33,53 +33,102 @@ def generateAlertOutput(message):
     output += '");}</script><body onLoad="alertMessage()"></body>'
     return output
 
-def generateLoginWelcome():
-    if 'username' not in login_session or 'picture' not in login_session:
-        return None
-    output = ''
-    output += '<h1>Welcome, '
-    output += login_session['username']
-
-    output += '!</h1>'
-    output += '<img src="'
-    output += login_session['picture']
-    output += '" style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-    flash("you are now logged in as %s" % login_session['username'])
-    return output
-
 def getHttpResult(url):
     h = httplib2.Http()
     return h.request(url, 'GET')[1]
 
-def createUser(login_session):
-    if ('username' in login_session):
-        newUser = User(name = login_session['username'],
-                email = login_session['email'],
-                picture = login_session['picture'])
-        session.add(newUser)
-        session.commit()
-        user = session.query(User).filter_by(email = login_session['email']).one()
-        return user.id
-    return None
-
-def getUserInfo(user_id):
+def getStudentInfoById(student_id):
     try:
-        user = session.query(User).filter_by(id = user_id).one()
+        student = session.query(Student).filter_by(id = student_id).one()
+        return student 
+    except:
+        return None
+
+def getStudentInfoByUsername(username):
+    try:
+        student = session.query(Student).filter_by(username = username).one()
         return user
     except:
         return None
 
-def getUserID(email):
+def getStudentInfoByEmail(email):
     try:
-        user = session.query(User).filter_by(email = email).one()
-        return user.id
+        student = session.query(Student).filter_by(email = email).one()
+        return user
     except:
         return None
+
+def getUniInfoByName(name):
+    try:
+        university = session.query(University).filter_by(name = name).one()
+        return university 
+    except:
+        return None
+
+# Login page
+@app.route('/login', methods = ['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
+        login_session['state'] = state
+        return render_template('login.html', STATE = state)
+    elif request.args.get('state') != login_session['state']:
+        return generateResponse('Invalid state parameter', 401)
+    else:
+        usernameInput = request.form['username']
+        passwordInput = request.form['password']
+        if  usernameInput == '' or passwordInput == '':
+            return generateResponse('Empty input field', 401) 
+        student = getStudentInfoByUsername(usernameInput)
+        if student == None or student.password != password:
+            return generateResponse('Incorrect username or password', 401)
+        login_session['username'] = usernameInput
+        flask.redirect(flask.url_for('dashboard'))
+
+#Register page
+@app.route('/register', methods = ['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        usernameInp = request.form['username']
+        nameInp = request.form['name']
+        emailInp = request.form['email']
+        passwordInp = request.form['password']
+        confpasswordInp = request.form['confirm_password']
+        universityInp = request.form['university']
+
+        if  usernameInp == '' or passwordInp == '' or emailInp == '' or universityInp == '':
+            return generateResponse('Empty input field', 401) 
+        elif confpasswordInp != passwordInp:
+            return generateResponse('Confirm password does not match', 401) 
+
+        university = getUniInfoByName(universityInp)
+        student = getStudentInfoByUsername(usernameInput)
+        studentEmail = getStudentInfoByEmail(emailInp)
+
+        if student != None:
+            return generateResponse('Username already exists', 401)
+        elif university == None:
+            return generateResponse('University not found', 401)
+        elif studentEmail != None:
+            return generateResponse('Email already exists', 401)
+        newStudent = Student(name=nameInp, 
+                username = usernameInp,
+                email = emailInp,
+                password = passwordInp,
+                university_id = university.id) 
+        session.add(newStudent)
+        session.commit()
+        login_session['username'] = usernameInput
+        flask.redirect(flask.url_for('profile/%s/' % usernameInp))
+
+@app.route('/logout')
+def register():
+    if 'username' in login_session:
+        del login_session['username']
+        flask.redirect(flask.url_for('login'))
 
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
     app.run(host = '0.0.0.0', port = 5000)
-
-
 
