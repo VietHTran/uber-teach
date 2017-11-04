@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+	<div class="look">
+      
+      <div class="ui middle alogned center aligned grid">
+        <h2>Login page</h2>
+        <form class="ui form">
+  			<div class="field">
+    			<label>Username</label>
+    			<input name="username" placeholder="Username" type="text">
+  			</div>
+
+  			<div class="field">
+    			<label>Password</label>
+    	<input name="password" placeholder="Password" type="text">
+  				</div>
+
+  			
+  <button class="ui button" type="submit">Submit</button>
+</form>
+        <a href="{{ url_for('register') }}" class="btn-primary">Sign up</a>
+        
+      </div>
+	
+{% endblock %}
