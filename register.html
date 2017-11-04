@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block content %}
+	<div class="look">
+      
+      <div class="ui middle alogned center aligned grid">
+        <h2>Login page</h2>
+        <form class="ui form">
+  			<div class="field">
+    			<label>Enter username</label>
+    			<input name="username" placeholder="Username" type="text">
+  			</div>
+
+  			<div class="field">
+    			<label>Create password Password</label>
+    	<input name="password" placeholder="Password" type="password">
+  			</div>
+
+  			<div class = "field">
+  				<label>Enter email adress</label>
+  				<input type="email" name="email-addr" placeholder="abcd@*.com">
+  			</div>
+
+  			
+  <button class="ui button" type="submit">Submit</button>
+</form>
+      </div>
+{% endblock %}
