@@ -1,3 +1,4 @@
+import flask
 from flask import Flask, render_template, request, redirect,jsonify, url_for, flash
 from flask import session as login_session
 app = Flask(__name__)
@@ -47,14 +48,14 @@ def getStudentInfoById(student_id):
 def getStudentInfoByUsername(username):
     try:
         student = session.query(Student).filter_by(username = username).one()
-        return user
+        return student 
     except:
         return None
 
 def getStudentInfoByEmail(email):
     try:
         student = session.query(Student).filter_by(email = email).one()
-        return user
+        return student 
     except:
         return None
 
@@ -66,21 +67,26 @@ def getUniInfoByName(name):
         return None
 
 # Login page
+@app.route('/', methods = ['GET', 'POST'])
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     if request.method == 'GET':
+        students = session.query(Student).all()
+        for student in students:
+            print student.name + " " + student.password
+        if 'username' in login_session:
+            flask.redirect(flask.url_for('dashboard'))
         state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
         login_session['state'] = state
         return render_template('login.html', STATE = state)
-    elif request.args.get('state') != login_session['state']:
-        return generateResponse('Invalid state parameter', 401)
     else:
         usernameInput = request.form['username']
         passwordInput = request.form['password']
         if  usernameInput == '' or passwordInput == '':
             return generateResponse('Empty input field', 401) 
         student = getStudentInfoByUsername(usernameInput)
-        if student == None or student.password != password:
+        print str(student)
+        if student == None or student.password != passwordInput:
             return generateResponse('Incorrect username or password', 401)
         login_session['username'] = usernameInput
         flask.redirect(flask.url_for('dashboard'))
@@ -122,7 +128,7 @@ def register():
         flask.redirect(flask.url_for('profile/%s/' % usernameInp))
 
 @app.route('/logout')
-def register():
+def logout():
     if 'username' in login_session:
         del login_session['username']
         flask.redirect(flask.url_for('login'))
