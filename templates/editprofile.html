@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+{% block content %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.css" rel="stylesheet" />
+<div class = "ui grid">
+<div class = "four wide column">
+		<img class = "ui small image" src="/static/example_fl.jpg">
+		<p>Username</p>
+    <h2>List of courses</h2>
+
+
+
+<div class="ui list">
+  <a class="item">
+    <i class="remove icon"></i>
+    <div class="content">
+      <div class="header">CMPEN 271</div>
+      <div class="description">course description</div>
+    </div>
+  </a>
+  <a class="item">
+    <i class="remove icon"></i>
+    <div class="content">
+      <div class="header">CMPSC 360</div>
+      <div class="description">course description</div>
+    </div>
+  </a>
+  <br>
+  <div class="ui labeled input">
+  <div class="ui label">
+    Add course:
+  </div>
+  <input placeholder="course name" type="text">
+</div>
+</div>
+
+
+
+
+    
+
+
+    
+
+	</div>
+<div class = "six wide column">
+
+		<div class = "ui list">
+			<div class="item">
+    			<i class="users icon"></i>
+    			<div class="content">
+      				Semantic UI
+    			</div>
+  			</div>
+  				<div class="item">
+    				<i class="marker icon"></i>
+    				<div class="content">
+      					New York, NY
+    				</div>
+  				</div>
+  				<div class = "item">
+  					<i class="university icon"></i>
+  					<div class = "content">
+  						Pennsylvania State
+  					</div>
+  				</div>
+  				<div class="item">
+    				<i class="mail icon"></i>
+    			<div class="content">
+      				<a href="mailto:jack@semantic-ui.com">jack@semantic-ui.com</a>
+    			</div>
+  				</div>
+  					<div class="item">
+    					<i class="linkify icon"></i>
+    					<div class="content">
+      						<a href="http://www.semantic-ui.com">semantic-ui.com</a>
+    					</div>
+  					</div>
+            <br> 
+
+            <div class="ui labeled input">
+  <div class="ui label">
+    Enter new name:
+  </div>
+  <input placeholder="current name" type="text">
+</div>
+
+<div class="ui negative message">
+  <i class="close icon"></i>
+  <div class="header">
+    Email is immutable
+  </div>
+  <p>current email
+</p></div>
+
+<div class="ui negative message">
+  <i class="close icon"></i>
+  <div class="header">
+    Username is immutable
+  </div>
+  <p>current username
+</p></div>
+
+
+
+		</div>
+	</div>
+	<div class = "six wide column">
+		
+	</div>
+</div>
+{% endblock %}
