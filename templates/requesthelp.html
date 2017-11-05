@@ -1,5 +1,12 @@
 {% extends "layout.html" %}
 {% block content %}
+<script>
+function onViewMapClick() {
+    var loc = document.getElementById("location");
+    var url = "https://www.google.com/maps/search/" + loc.value;
+    window.open(url);
+}
+</script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.css" rel="stylesheet" />
     <nav class="ui borderless menu">
         <div class = "ui container">
@@ -31,22 +38,23 @@
     <form action="#" method="POST" style="display: inline-block">
         <h1 class="ui header">Send Help Request</h1>
 
-        <div class="field">
-            <input name="subject" placeholder="subject" type="text">
-        </div>
-        <br>
         <div class = "ui form">
+            <div class="field">
+                <input name="subject" placeholder="subject" type="text">
+            </div>
+            <br>
             <textarea placeholder="description" rows="5" cols="70" name="description"></textarea>
             <br>
             <br>
             <label>Location</label>
             <div class="field">
-                <input name = "location" placeholder="ex: 42 Wallaby Way Sydney" type = "text">
+                <input name = "location" id="location" placeholder="ex: 42 Wallaby Way Sydney" type = "text">
+                <button type="button" class="ui button" onclick="onViewMapClick()">View On Google Map</button>
             </div>
         </div>
         <br>
         <br>
-        <div class="ui fluid selection dropdown">
+        <div class="ui fluid selection">
             <input name="course_name" type="hidden">
             <i class="dropdown icon"></i>
             <div class="default text">Course:</div>

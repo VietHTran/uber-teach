@@ -78,10 +78,14 @@ function displaySection(id) {
                         </form>
                     </div>
                     {% elif pr.request.status == 'PROGRESS' %}
-                    <div class="ui two buttons">
+                    <div class="ui three buttons">
                         <form method="POST" action="{{ url_for('cancelTutor') }}">
                             <input name="request_id" value="{{ pr.request.id }}" style="display: none">
                             <input class="ui basic red button" type="submit" value="Cancel Tutor">
+                        </form>
+                        <form action="https://www.google.com/maps/search/{{ pr.request.location }}"
+                            target="_blank">
+                            <input class="ui basic button" type="submit" value="View Map">
                         </form>
                         <form method="POST" action="{{ url_for('completeTutoring') }}">
                             <input name="request_id" value="{{ pr.request.id }}" style="display: none">
@@ -123,10 +127,14 @@ function displaySection(id) {
                     </div>
                 </div>
                 <div class="extra content">
-                    <div class="ui one buttons">
+                    <div class="ui two buttons">
                         <form method="POST" action="{{ url_for('acceptRequest') }}">
                             <input name="request_id" value="{{ op.request.id }}" style="display: none">
                             <input class="ui basic green button" type="submit" value="Accept Request">
+                        </form>
+                        <form action="https://www.google.com/maps/search/{{ op.request.location }}"
+                            target="_blank">
+                            <input class="ui basic button" type="submit" value="View Map">
                         </form>
                     </div>
                 </div>
@@ -156,6 +164,14 @@ function displaySection(id) {
                     </div>
                     <div class="description">
                         {{ wkr.request.description }}
+                    </div>
+                </div>
+                <div class="extra content">
+                    <div class="ui one buttons">
+                        <form action="https://www.google.com/maps/search/{{ wkr.request.location }}"
+                           target="_blank">
+                            <input class="ui basic button" type="submit" value="View Map">
+                        </form>
                     </div>
                 </div>
             </div>
