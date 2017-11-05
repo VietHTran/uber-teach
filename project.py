@@ -215,6 +215,12 @@ def editProfile():
     elif request.method == 'POST':
         nameInp = request.form['name']
         courses = request.form.getList('course')
+        return flask.redirect(flask.url_for('profile', username = login_session['username']))
+
+@app.route('/dashboard', methods = ['GET', 'POST'])
+def dashboard():
+    if not ('username' in login_session):
+        return flask.redirect(flask.url_for('login'))
 
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'

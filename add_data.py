@@ -15,7 +15,7 @@ session.add(university1)
 session.commit()
 
 university2 = University(name = "University of Pennsylvania")
-session.add(university1)
+session.add(university2)
 session.commit()
 
 course1 = Course(name="CMPSC360", university_id="1")
