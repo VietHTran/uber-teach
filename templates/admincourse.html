@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.css" rel="stylesheet" />
+<h1>Add Course</h1>
+<h3>Hello admin</h3>
+<form action="#" method="POST">
+    Course: <input name="name" type="text"> 
+    <br>
+    University:
+    <select name="university_id">
+        {% for u in universities %}
+        <option value="{{ u.id }}">{{ u.name }}</option>
+        {% endfor %}
+    </select>
+    <br>
+    <input type="submit" value="Create Course">
+</form>
+{%endblock%}
