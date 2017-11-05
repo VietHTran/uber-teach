@@ -1,0 +1,146 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.css" rel="stylesheet" />
+<script>
+const SECTIONS = ["post", "your", "open", "working"];
+function displaySection(id) {
+    if (id === "post") {
+        window.location.href = "{{ url_for('requestHelp') }}"; 
+        return;
+    }
+    for (var i=0; i<SECTIONS.length; ++i) {
+        document.getElementById(SECTIONS[i]).style.visibility = "collapse";
+    }
+    document.getElementById(id).style.visibility = "visible";
+}
+</script>
+<div class="ui four item menu">
+  <button class="item" onclick="displaySection('post')">Post Requests</button>
+  <button class="item" onclick="displaySection('your')">Your Requests</button>
+  <button class="item" onclick="displaySection('open')">Open Requests</button>
+  <button class="item" onclick="displaySection('working')">Working Requests</button>
+</div>
+<center>
+    <div id="post">
+    </div>
+    <div id="your" style="visibility: collapse">
+        {% if posted is defined %}
+        {% for pr in posted %}
+        <div class="ui cards">
+            <div class="card">
+                <div class="content">
+                    <img class="left floated mini ui image" src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Profile_Icon.png" >
+                    <div class="header">
+                        {{ pr.request.subject }}
+                    </div>
+                    <div class="meta">
+                        {{ pr.course.name }}
+                    </div>
+                    <div class="meta">
+                        By: <a href="{{ url_for('profile', username = pr.student.username) }}">
+                            {{ pr.student.username }}
+                        </a>
+                    </div>
+                    <div class="description">
+                        {{ pr.request.description }}
+                    </div>
+                    <div class="meta">
+                        Status: {{ pr.request.status }}
+                    </div>
+                </div>
+                <div class="extra content">
+                    {% if pr.request.status == 'OPEN' %}
+                    <div class="ui one buttons">
+                        <form method="POST" action="{{ url_for('deleteRequestRoute') }}">
+                            <input name="request_id" value="{{ pr.request.id }}" style="display: none">
+                            <input class="ui basic red button" type="submit" value="Delete Request">
+                        </form>
+                    </div>
+                    {% elif pr.request.status == 'PROGRESS' %}
+                    <div class="ui two buttons">
+                        <form method="POST" action="{{ url_for('cancelTutor') }}">
+                            <input name="request_id" value="{{ pr.request.id }}" style="display: none">
+                            <input class="ui basic red button" type="submit" value="Cancel Tutor">
+                        </form>
+                        <form method="POST" action="{{ url_for('completeTutoring') }}">
+                            <input name="request_id" value="{{ pr.request.id }}" style="display: none">
+                            <input class="ui basic green button" type="submit" value="Tutoring Complete">
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        You haven't post any request
+        {% endif %}
+    </div>
+    <div id="open">
+        {% if opn is defined %}
+        {% for op in opn %}
+        <div class="ui cards">
+            <div class="card">
+                <div class="content">
+                    <img class="left floated mini ui image" src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Profile_Icon.png" >
+                    <div class="header">
+                        {{ op.request.subject }}
+                    </div>
+                    <div class="meta">
+                        {{ op.course.name }}
+                    </div>
+                    <div class="meta">
+                        By: <a href="{{ url_for('profile', username = op.student.username) }}">
+                            {{ op.student.username }}
+                        </a>
+                    </div>
+                    <div class="description">
+                        {{ op.request.description }}
+                    </div>
+                    <div class="meta">
+                        Status: {{ op.request.status }}
+                    </div>
+                </div>
+                <div class="extra content">
+                    <div class="ui one buttons">
+                        <form method="POST" action="{{ url_for('acceptRequest') }}">
+                            <input name="request_id" value="{{ op.request.id }}" style="display: none">
+                            <input class="ui basic green button" type="submit" value="Accept Request">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        No open requests
+        {% endif %}
+    </div>
+    <div id="working" style="visibility: collapse">
+        {% for wkr in working %}
+        <div class="ui cards">
+            <div class="card">
+                <div class="content">
+                    <img class="left floated mini ui image" src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Profile_Icon.png" >
+                    <div class="header">
+                        {{ wkr.request.subject }}
+                    </div>
+                    <div class="meta">
+                        {{ wkr.course.name }}
+                    </div>
+                    <div class="meta">
+                        Requester: <a href="{{ url_for('profile', username = wkr.student.username) }}">
+                            {{ wkr.student.username }}
+                        </a>
+                    </div>
+                    <div class="description">
+                        {{ wkr.request.description }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</center>
+{%endblock%}

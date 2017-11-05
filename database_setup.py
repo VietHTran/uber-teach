@@ -2,6 +2,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import Float, DateTime, Boolean 
+from sqlalchemy.sql import func 
 from sqlalchemy import create_engine
  
 Base = declarative_base()
@@ -101,7 +102,7 @@ class HelpRequest(Base):
     location = Column(String, nullable=False)
     course_id = Column(Integer, ForeignKey('course.id'))
     status = Column(String, nullable=False) # OPEN,PROGRESS,CLOSED
-    date = Column(DateTime, nullable=False)
+    date = Column(DateTime(timezone=True), nullable=False, default=func.now())
     helper_id = Column(Integer, ForeignKey('student.id'))
 
     @property
