@@ -336,7 +336,8 @@ def deleteRequest():
 def requestHelp():
     if not ('username' in login_session):
         return flask.redirect(flask.url_for('login'))
-    student = getStudentInfoByUsername(login_session['username'])
+    username = login_session['username']
+    student = getStudentInfoByUsername(username)
     if request.method == 'GET':
         courses = getCoursesInfoByStudentId(student.id)
         return render_template('requesthelp.html', courses = courses)
@@ -345,17 +346,15 @@ def requestHelp():
         descriptionInp = request.form['description']
         locationInp = request.form['location']
         courseInp = request.form['course']
-        dateTime = datetime.now()
-        if subjectInp == '' or locationInp == '' or courseInp:
+        if subjectInp == '' or locationInp == '':
             return generateResponse('Please enter the required field', 401)
         helpRequest = HelpRequest(
-                student_id = Student.id,
+                student_id = student.id,
                 subject = subjectInp,
                 description = descriptionInp,
-                logout = locationInp,
+                location = locationInp,
                 course_id = courseInp,
-                status = "OPEN",
-                date = dateTime)
+                status = "OPEN")
         session.add(helpRequest)
         session.commit()
         return flask.redirect(flask.url_for('dashboard'))

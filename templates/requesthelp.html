@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block content %}
+<center>
+    <form action="#" method="POST" style="display: inline-block">
+        <h1 class="ui header">Send Help Request</h1>
+
+        <div class="field">
+            <input name="subject" placeholder="subject" type="text">
+        </div>
+        <br>
+        <div class = "ui form">
+            <textarea placeholder="description" rows="5" cols="70" name="description"></textarea>
+            <br>
+            <br>
+            <label>Location</label>
+            <div class="field">
+                <input name = "location" placeholder="ex: 42 Wallaby Way Sydney" type = "text">
+            </div>
+        </div>
+        <br>
+        <br>
+        <div class="ui fluid selection dropdown">
+            <input name="course_name" type="hidden">
+            <i class="dropdown icon"></i>
+            <div class="default text">Course:</div>
+            <select class="menu" name="course">
+                {% for course in courses %}
+                <option value="{{ course.name }}">{{ course.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <br>
+        <br>
+        <div>
+            <a href="{{ url_for('dashboard') }}" style="display: inline-block">Back</a>
+            <input type="submit" value="Post" />
+        </div>
+    </form>
+</center>
+{%endblock%}
