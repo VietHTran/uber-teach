@@ -195,6 +195,21 @@ def closeRequest(requestId):
         print str(ex)
         return False
 
+def getEnrollmentByUsername(username):
+    try:
+        student = session.query(Student).filter_by(username = username).one()
+        enrollments = session.query(Enrollment).filter_by(student_id = student.id)
+        courses = []
+        for enrollment in enrollments:
+            course = session.query(Course).filter_by(id = enrollment.course_id).one()
+            holder = {
+                    'course': course,
+                    'credits': enrollment.credits
+                    }
+            courses.append(holder)
+        return courses
+    except Exception as ex:
+        return None 
 # Login page
 @app.route('/', methods = ['GET', 'POST'])
 @app.route('/login', methods = ['GET', 'POST'])
@@ -270,15 +285,15 @@ def profile(username):
         editBtnVisibility = 'visible'
     student = getStudentInfoByUsername(username)
     university = getUniInfoById(student.university_id)
-    courses = getCoursesInfoByStudentId(student.id) 
-    if courses == None:
-        return generateResponse("Error getting courses", 401)
+    data = getEnrollmentByUsername(username)
+    if data == None:
+        return generateResponse("Error getting courses and enrollments", 401)
     return render_template('profile.html',
             username = username,
             name = student.name,
             email = student.email,
             university = university.name,
-            courses = courses,
+            data = data,
             editBtnVisibility = editBtnVisibility)
 
 @app.route('/editprofile', methods = ['GET', 'POST'])
