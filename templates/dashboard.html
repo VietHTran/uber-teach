@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.css" rel="stylesheet" >
 <script>
 const SECTIONS = ["post", "your", "open", "working"];
 function displaySection(id) {
@@ -15,12 +15,20 @@ function displaySection(id) {
     document.getElementById(id).style.visibility = "visible";
 }
 </script>
-<div class="ui four item menu">
-  <button class="item" onclick="displaySection('post')">Post Requests</button>
-  <button class="item" onclick="displaySection('your')">Your Requests</button>
-  <button class="item" onclick="displaySection('open')">Open Requests</button>
-  <button class="item" onclick="displaySection('working')">Working Requests</button>
+
+<nav class="ui borderless menu">
+    <div class = "ui container">
+        <div class = "left menu"><button class="ui left floated button"><i class = "home icon"></i>Home</button></div>
+        <a class="item" onclick="displaySection('post')">Post Requests</a>
+        <a class="item" onclick="displaySection('your')">Your Requests</a>
+        <a class="item" onclick="displaySection('open')">Open Requests</a>
+        <a class="item" onclick="displaySection('working')">Working Requests</a>
+        <div class = "right menu">
+            <div class = "left menu"><button class="ui left floated button"><i class = "user icon"></i>Profile</button></div>
+            <div class = "left menu"><button class="ui left floated button"><i class = "power icon"></i>Logout</button></div>
 </div>
+</nav>
+
 <center>
     <div id="post">
     </div>
