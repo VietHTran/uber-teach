@@ -100,10 +100,9 @@ class HelpRequest(Base):
     description = Column(String)
     location = Column(String, nullable=False)
     course_id = Column(Integer, ForeignKey('course.id'))
-    status = Column(String, nullable=False)
+    status = Column(String, nullable=False) # OPEN,PROGRESS,CLOSED
     date = Column(DateTime, nullable=False)
     helper_id = Column(Integer, ForeignKey('student.id'))
-    amount = Column(Float, nullable=False)
 
     @property
     def serialize(self):
@@ -116,7 +115,7 @@ class HelpRequest(Base):
            'course_id'    : self.university_id,
            'status'       : self.status,
            'date'         : self.date,
-           'amount'       : self.amount,
+           'helper_id'    : self.helper_id,
        }
 
 engine = create_engine('sqlite:///uber-teach-db.db')
