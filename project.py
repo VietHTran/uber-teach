@@ -120,6 +120,11 @@ def getYourRequests(username):
         student = getStudentInfoByUsername(username)
         requests = session.query(HelpRequest).filter_by(
                 student_id = student.id).order_by(HelpRequest.date)
+        for req in  requests:
+            student = getStudentInfoById(req.student_id)
+            req.student = student
+        for req in requests:
+            print reg.student.name 
         return requests 
     except:
         return None 
@@ -187,8 +192,8 @@ def login():
         if student == None or student.password != passwordInput:
             return generateResponse('Incorrect username or password', 401)
         login_session['username'] = usernameInput
-        # return flask.redirect(flask.url_for('dashboard'))
-        return flask.redirect(flask.url_for('profile', username = student.username))
+        return flask.redirect(flask.url_for('dashboard'))
+        # return flask.redirect(flask.url_for('profile', username = student.username))
 
 #Register page
 @app.route('/register', methods = ['GET', 'POST'])
@@ -285,6 +290,7 @@ def editProfile():
 def dashboard():
     if not ('username' in login_session):
         return flask.redirect(flask.url_for('login'))
+    username = login_session['username']
     postedRequests = getYourRequests(username) 
     openRequests = getRequestsForUser(username) 
     workingRequests = getRequestsInProgress(username) 
