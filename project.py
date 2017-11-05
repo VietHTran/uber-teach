@@ -95,7 +95,7 @@ def updateStudentInfo(username, name, newCourses):
             if not(course.name in newCourses):
                 session.delete(enrollment)
                 session.commit()
-            elif:
+            else:
                 newCourses.remove(course.name)
         for newCourse in newCourses:
             course = session.query(Course).filter_by(name = newCourse)
@@ -130,11 +130,11 @@ def login():
         if  usernameInput == '' or passwordInput == '':
             return generateResponse('Empty input field', 401) 
         student = getStudentInfoByUsername(usernameInput)
-        print str(student)
         if student == None or student.password != passwordInput:
             return generateResponse('Incorrect username or password', 401)
         login_session['username'] = usernameInput
-        flask.redirect(flask.url_for('dashboard'))
+        # return flask.redirect(flask.url_for('dashboard'))
+        return flask.redirect(flask.url_for('profile', username = student.username))
 
 #Register page
 @app.route('/register', methods = ['GET', 'POST'])
@@ -142,7 +142,6 @@ def register():
     if request.method == 'GET':
         return render_template('register.html')
     elif request.method == 'POST':
-        print "ggg ex"
         usernameInp = request.form['username']
         nameInp = request.form['name']
         emailInp = request.form['email']
@@ -167,23 +166,23 @@ def register():
                 username = usernameInp,
                 email = emailInp,
                 password = passwordInp,
-                university_id = university.id) 
+                university_id = university.id,
+                is_admin = False) 
         session.add(newStudent)
         session.commit()
-        login_session['username'] = usernameInput
-        flask.redirect(flask.url_for('profile', username = usernameInp))
+        login_session['username'] = usernameInp
+        return flask.redirect(flask.url_for('profile', username = usernameInp))
 
 @app.route('/logout')
 def logout():
     if 'username' in login_session:
         del login_session['username']
-        flask.redirect(flask.url_for('login'))
+        return flask.redirect(flask.url_for('login'))
 
 @app.route('/profile/<username>/')
 def profile(username):
     if not ('username' in login_session):
-        flask.redirect(flask.url_for('login'))
-        return
+        return flask.redirect(flask.url_for('login'))
     editBtnVisibility = 'collapse'
     if username == login_session['username']:
         editBtnVisibility = 'visible'
@@ -198,17 +197,12 @@ def profile(username):
             courses = courses,
             editBtnVisibility = editBtnVisibility)
 
-@app.route('/editprofile/<username>/', methods = ['GET', 'POST'])
-def editProfile(username):
-    if not ('username' in login_session):
-        flask.redirect(flask.url_for('login'))
-        return
-    elif login_session['username'] != username:
-        flask.redirect(flask.url_for('profile', username = usernameInp))
-        return
+@app.route('/editprofile', methods = ['GET', 'POST'])
+def editProfile():
+    if login_session['username'] != username:
+        return flask.redirect(flask.url_for('profile', username = usernameInp))
     if request.method == 'GET':
-        if username == login_session['username']:
-            editBtnVisibility = 'visible'
+        username = login_session['username']
         student = getStudentInfoByUsername(username)
         university = getUniInfoById(student.university_id)
         courses = getCoursesInfoByStudentId(student.id) 
@@ -218,7 +212,7 @@ def editProfile(username):
                 email = student.email,
                 university = university.name,
                 courses = courses)
-    else request.method == 'POST':
+    elif request.method == 'POST':
         nameInp = request.form['name']
         courses = request.form.getList('course')
 
