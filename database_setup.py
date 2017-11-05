@@ -23,7 +23,7 @@ class Course(Base):
     __tablename__ = 'course'
    
     id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+    name = Column(String(250), nullable=False, unique=True)
     university_id = Column(Integer, ForeignKey('university.id'))
 
     @property

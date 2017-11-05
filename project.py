@@ -66,6 +66,51 @@ def getUniInfoByName(name):
     except:
         return None
 
+def getUniInfoById(university_id):
+    try:
+        university = session.query(University).filter_by(id = university_id).one()
+        return university 
+    except:
+        return None
+
+def getCoursesInfoByStudentId(student_id):
+    try:
+        courses = []
+        enrollments = session.query(Enrollment).filter_by(student_id = student_id)
+        for enrollment in enrollments:
+            course = session.query(Course).filter_by(id = enrollment.course_id)
+            courses.append(course)
+        return courses 
+    except:
+        return None
+
+def updateStudentInfo(username, name, newCourses):
+    try:
+        student = getStudentInfoByUsername(username)
+        student.name = name
+        session.commit()
+        enrollments = session.query(Enrollment).filter_by(student_id = student.id)
+        for enrollment in enrollments:
+            course = session.query(Course).filter_by(id = enrollment.course_id)
+            if not(course.name in newCourses):
+                session.delete(enrollment)
+                session.commit()
+            elif:
+                newCourses.remove(course.name)
+        for newCourse in newCourses:
+            course = session.query(Course).filter_by(name = newCourse)
+            if course is None:
+                continue
+            enrollment = Enrollment(
+                    student_id = student.id, 
+                    course_id = course.id,
+                    credits = 0)
+            session.add(enrollment)
+            session.commit()
+        return True 
+    except:
+        return False 
+
 # Login page
 @app.route('/', methods = ['GET', 'POST'])
 @app.route('/login', methods = ['GET', 'POST'])
@@ -126,7 +171,7 @@ def register():
         session.add(newStudent)
         session.commit()
         login_session['username'] = usernameInput
-        flask.redirect(flask.url_for('profile/%s/' % usernameInp))
+        flask.redirect(flask.url_for('profile', username = usernameInp))
 
 @app.route('/logout')
 def logout():
@@ -134,8 +179,50 @@ def logout():
         del login_session['username']
         flask.redirect(flask.url_for('login'))
 
+@app.route('/profile/<username>/')
+def profile(username):
+    if not ('username' in login_session):
+        flask.redirect(flask.url_for('login'))
+        return
+    editBtnVisibility = 'collapse'
+    if username == login_session['username']:
+        editBtnVisibility = 'visible'
+    student = getStudentInfoByUsername(username)
+    university = getUniInfoById(student.university_id)
+    courses = getCoursesInfoByStudentId(student.id) 
+    return render_template('profile.html',
+            username = username,
+            name = student.name,
+            email = student.email,
+            university = university.name,
+            courses = courses,
+            editBtnVisibility = editBtnVisibility)
+
+@app.route('/editprofile/<username>/', methods = ['GET', 'POST'])
+def editProfile(username):
+    if not ('username' in login_session):
+        flask.redirect(flask.url_for('login'))
+        return
+    elif login_session['username'] != username:
+        flask.redirect(flask.url_for('profile', username = usernameInp))
+        return
+    if request.method == 'GET':
+        if username == login_session['username']:
+            editBtnVisibility = 'visible'
+        student = getStudentInfoByUsername(username)
+        university = getUniInfoById(student.university_id)
+        courses = getCoursesInfoByStudentId(student.id) 
+        return render_template('editprofile.html',
+                username = username,
+                name = student.name,
+                email = student.email,
+                university = university.name,
+                courses = courses)
+    else request.method == 'POST':
+        nameInp = request.form['name']
+        courses = request.form.getList('course')
+
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
     app.run(host = '0.0.0.0', port = 5000)
-
