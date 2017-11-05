@@ -2,40 +2,113 @@
 
 {% block content %}
 <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.css" rel="stylesheet" />
-
-
+<script>
+const SECTIONS = ["post", "your", "open", "working"];
+function displaySection(id) {
+    if (id === "post") {
+        window.location.href = "{{ url_for('requestHelp') }}"; 
+    }
+    for (var i=0; i<SECTIONS.length; ++i) {
+        document.getElementById(SECTIONS[i]).style.visibility = "collapse";
+    }
+    document.getElementById(id).style.visibility = "visible";
+}
+</script>
 <div class="ui four item menu">
-  <button class="item">Past Requests</button>
-  <button class="item">Your Requests</button>
-  <button class="item">Open Requests</button>
-  <button class="item">Open Requests</button>
+  <button class="item" onclick="displaySection('post')">Post Requests</button>
+  <button class="item" onclick="displaySection('your')">Your Requests</button>
+  <button class="item" onclick="displaySection('open')">Open Requests</button>
+  <button class="item" onclick="displaySection('working')">Working Requests</button>
 </div>
-
-
 <center>
-	<div class="ui cards">
-  <div class="card">
-    <div class="content">
-      <img class="left floated mini ui image" src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Profile_Icon.png" >
-      <div class="header">
-        
-      </div>
-      <div class="meta">
-        which course
-      </div>
-      <div class="description">
-        description of the problem...rrrrrrrrrrrrrrrrrrrrr
-        rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr.......
-      </div>
+    <div id="post">
     </div>
-    <div class="extra content">
-      <div class="ui two buttons">
-        <div class="ui basic green button">Approve</div>
-        <div class="ui basic red button">Decline</div>
-      </div>
+    <div id="your" style="visibility: collapse">
+        {% if posted is defined %}
+        {% for pr in posted %}
+        <div class="ui cards">
+            <div class="card">
+                <div class="content">
+                    <img class="left floated mini ui image" src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Profile_Icon.png" >
+                    <div class="header">
+                        {{ pr.request.subject }}
+                    </div>
+                    <div class="meta">
+                        {{ pr.course.name }}
+                    </div>
+                    <div class="meta">
+                        By: {{ pr.student.username }}
+                    </div>
+                    <div class="description">
+                        {{ pr.request.description }}
+                    </div>
+                    <div class="meta">
+                        Status: {{ pr.request.status }}
+                    </div>
+                </div>
+                <div class="extra content">
+                    <div class="ui one buttons">
+                        <div class="ui basic red button">Delete Request</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        You haven't post any request
+        {% endif %}
     </div>
-  </div>
-  
-</div>
+    <div id="open">
+        {% if opn is defined %}
+        {% for op in opn %}
+        <div class="ui cards">
+            <div class="card">
+                <div class="content">
+                    <img class="left floated mini ui image" src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Profile_Icon.png" >
+                    <div class="header">
+                        {{ op.request.subject }}
+                    </div>
+                    <div class="meta">
+                        {{ op.course.name }}
+                    </div>
+                    <div class="meta">
+                        By: {{ op.student.username }}
+                    </div>
+                    <div class="description">
+                        {{ op.request.description }}
+                    </div>
+                </div>
+                <div class="extra content">
+                    <div class="ui one buttons">
+                        <div class="ui basic green button">Accept Request</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        No open requests
+        {% endif %}
+    </div>
+    <div id="working" style="visibility: collapse">
+        {% for wkr in working %}
+        <div class="ui cards">
+            <div class="card">
+                <div class="content">
+                    <img class="left floated mini ui image" src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Profile_Icon.png" >
+                    <div class="header">
+                        {{ wkr.request.subject }}
+                    </div>
+                    <div class="meta">
+                        {{ wkr.course.name }}
+                    </div>
+                    <div class="description">
+                        {{ wkr.request.description }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </center>
 {%endblock%}

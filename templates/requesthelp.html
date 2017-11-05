@@ -25,7 +25,7 @@
             <div class="default text">Course:</div>
             <select class="menu" name="course">
                 {% for course in courses %}
-                <option value="{{ course.name }}">{{ course.name }}</option>
+                <option value="{{ course.id }}">{{ course.name }}</option>
                 {% endfor %}
             </select>
         </div>
