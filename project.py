@@ -1,18 +1,13 @@
+import os
 import flask
 import datetime 
 from flask import Flask, render_template, request, redirect,jsonify, url_for, flash
 from flask import session as login_session
 app = Flask(__name__)
-
 from sqlalchemy import create_engine, asc, and_ 
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, University, Course, Student, Transaction, HelpRequest, Enrollment
 import random, string
-
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.client import FlowExchangeError 
-import httplib2
-import json
 from flask import make_response
 import requests
 
@@ -34,10 +29,6 @@ def generateAlertOutput(message):
     output += message
     output += '");}</script><body onLoad="alertMessage()"></body>'
     return output
-
-def getHttpResult(url):
-    h = httplib2.Http()
-    return h.request(url, 'GET')[1]
 
 def getStudentInfoById(student_id):
     try:
@@ -469,7 +460,7 @@ def requestHelp():
         return flask.redirect(flask.url_for('dashboard'))
         
 
+# app.secret_key = 'super_secret_key'
 if __name__ == '__main__':
-    app.secret_key = 'super_secret_key'
     app.debug = True
     app.run(host = '0.0.0.0', port = 5000)
