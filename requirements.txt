@@ -11,7 +11,7 @@ itsdangerous==0.24
 Jinja2==2.9.6
 MarkupSafe==1.0
 matplotlib==1.5.2rc2
-
+mechanize==0.2.5
 mock==2.0.0
 numpy==1.11.3
 oauth2client==4.1.2
@@ -30,6 +30,7 @@ pytz==2014.10
 requests==2.12.4
 rsa==3.4.2
 six==1.10.0
+mysqlclient
 SQLAlchemy==1.1.15
 
 unity-lens-photos==1.0
