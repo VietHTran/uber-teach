@@ -79,10 +79,10 @@ def getCoursesInfoByStudentId(student_id):
         courses = []
         enrollments = session.query(Enrollment).filter_by(student_id = student_id)
         for enrollment in enrollments:
-            course = session.query(Course).filter_by(id = enrollment.course_id)
+            course = session.query(Course).filter_by(id = enrollment.course_id).one()
             courses.append(course)
         return courses 
-    except:
+    except Exception as ex:
         return None
 
 def updateStudentInfo(username, name, newCourses):
@@ -91,6 +91,7 @@ def updateStudentInfo(username, name, newCourses):
         student.name = name
         session.commit()
         enrollments = session.query(Enrollment).filter_by(student_id = student.id)
+            
         for enrollment in enrollments:
             course = session.query(Course).filter_by(id = enrollment.course_id).one()
             if not(course.name in newCourses):
@@ -99,9 +100,11 @@ def updateStudentInfo(username, name, newCourses):
             else:
                 newCourses.remove(course.name)
         for newCourse in newCourses:
+            print newCourse
             course = session.query(Course).filter_by(name = newCourse).one()
-            if course is None:
+            if session.query(Course).filter_by(name = newCourse).count() == 0:
                 continue
+            print course.name
             enrollment = Enrollment(
                     student_id = student.id, 
                     course_id = course.id,
@@ -170,8 +173,6 @@ def deleteRequest(requestId):
 def login():
     if request.method == 'GET':
         students = session.query(Student).all()
-        for student in students:
-            print student.name + " " + student.password
         if 'username' in login_session:
             return flask.redirect(flask.url_for('dashboard'))
         state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
@@ -242,6 +243,8 @@ def profile(username):
     student = getStudentInfoByUsername(username)
     university = getUniInfoById(student.university_id)
     courses = getCoursesInfoByStudentId(student.id) 
+    if courses == None:
+        return generateResponse("Error getting courses", 401)
     return render_template('profile.html',
             username = username,
             name = student.name,
@@ -252,8 +255,9 @@ def profile(username):
 
 @app.route('/editprofile', methods = ['GET', 'POST'])
 def editProfile():
-    if login_session['username'] != username:
-        return flask.redirect(flask.url_for('profile', username = usernameInp))
+    if not ('username' in login_session):
+        return flask.redirect(flask.url_for('login'))
+    username = login_session['username']
     if request.method == 'GET':
         username = login_session['username']
         student = getStudentInfoByUsername(username)
@@ -267,7 +271,14 @@ def editProfile():
                 courses = courses)
     elif request.method == 'POST':
         nameInp = request.form['name']
-        courses = request.form.getList('course')
+        courses = request.form.getlist('course')
+        if nameInp == '':
+            student = getStudentInfoByUsername(username)
+            nameInp = student.name 
+        if updateStudentInfo(username, nameInp, courses):
+            print "Update profile successfully"
+        else:
+            print "Update profile failed"
         return flask.redirect(flask.url_for('profile', username = login_session['username']))
 
 @app.route('/dashboard', methods = ['GET', 'POST'])
@@ -305,7 +316,7 @@ def declineRequest():
     return flask.redirect(flask.url_for('dashboard'))
 
 @app.route('/dashboard/delete', methods = ['POST'])
-def declineRequest():
+def deleteRequest():
     if not ('username' in login_session):
         return flask.redirect(flask.url_for('login'))
     requestId = request.form['request_id']
