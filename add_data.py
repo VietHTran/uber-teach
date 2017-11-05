@@ -34,6 +34,14 @@ course4 = Course(name="HIST20", university_id="2")
 session.add(course4)
 session.commit()
 
+course5 = Course(name="MATH220", university_id="1")
+session.add(course5)
+session.commit()
+
+course6 = Course(name="HIST150", university_id="1")
+session.add(course6)
+session.commit()
+
 admin = Student(username="admin", name="admin", password="admin", email="vht1@psu.edu", university_id="1", is_admin=True)
 session.add(admin)
 session.commit()

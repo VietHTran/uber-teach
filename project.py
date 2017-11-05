@@ -1,4 +1,5 @@
 import flask
+import datetime 
 from flask import Flask, render_template, request, redirect,jsonify, url_for, flash
 from flask import session as login_session
 app = Flask(__name__)
@@ -78,10 +79,10 @@ def getCoursesInfoByStudentId(student_id):
         courses = []
         enrollments = session.query(Enrollment).filter_by(student_id = student_id)
         for enrollment in enrollments:
-            course = session.query(Course).filter_by(id = enrollment.course_id)
+            course = session.query(Course).filter_by(id = enrollment.course_id).one()
             courses.append(course)
         return courses 
-    except:
+    except Exception as ex:
         return None
 
 def updateStudentInfo(username, name, newCourses):
@@ -90,17 +91,20 @@ def updateStudentInfo(username, name, newCourses):
         student.name = name
         session.commit()
         enrollments = session.query(Enrollment).filter_by(student_id = student.id)
+            
         for enrollment in enrollments:
-            course = session.query(Course).filter_by(id = enrollment.course_id)
+            course = session.query(Course).filter_by(id = enrollment.course_id).one()
             if not(course.name in newCourses):
                 session.delete(enrollment)
                 session.commit()
             else:
                 newCourses.remove(course.name)
         for newCourse in newCourses:
-            course = session.query(Course).filter_by(name = newCourse)
-            if course is None:
+            print newCourse
+            course = session.query(Course).filter_by(name = newCourse).one()
+            if session.query(Course).filter_by(name = newCourse).count() == 0:
                 continue
+            print course.name
             enrollment = Enrollment(
                     student_id = student.id, 
                     course_id = course.id,
@@ -111,16 +115,66 @@ def updateStudentInfo(username, name, newCourses):
     except:
         return False 
 
+def getYourRequests(username):
+    try:
+        student = getStudentInfoByUsername(username)
+        requests = session.query(HelpRequest).filter_by(
+                student_id = student.id).order_by(HelpRequest.date)
+        return requests 
+    except:
+        return None 
+    
+def getRequestsForUser(username):
+    try:
+        student = getStudentInfoByUsername(username)
+        courses = getCoursesInfoByStudentId()
+        courseIds = [course.id for course in courses]
+        requests = session.query(HelpRequest).filter_by(
+                HelpRequest.course_id.in_(courseIds),
+                status = "OPEN")
+        return requests 
+    except:
+        return None 
+
+def getRequestsInProgress(username):
+    try:
+        student = getStudentInfoByUsername(username)
+        requests = session.query(HelpRequest).filter_by(
+                helper_id = student.id,
+                status = "PROGRESS")
+        return requests 
+    except:
+        return None 
+
+def updateRequestStatus(requestId, status, username):
+    try:
+        request = session.query(HelpRequest).filter_by(id = requestId).one()
+        student = session.query(Student).filter_by(username = username).one()
+        request.status = status
+        if status == 'PROGRESS':
+            request.helper_id = student.id
+        session.commit()
+        return True
+    except:
+        return False
+
+def deleteRequest(requestId):
+    try:
+        request = session.query(HelpRequest).filter_by(id = requestId).one()
+        session.delete(request)
+        session.commit()
+        return True
+    except:
+        return False
+
 # Login page
 @app.route('/', methods = ['GET', 'POST'])
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     if request.method == 'GET':
         students = session.query(Student).all()
-        for student in students:
-            print student.name + " " + student.password
         if 'username' in login_session:
-            flask.redirect(flask.url_for('dashboard'))
+            return flask.redirect(flask.url_for('dashboard'))
         state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
         login_session['state'] = state
         return render_template('login.html', STATE = state)
@@ -189,6 +243,8 @@ def profile(username):
     student = getStudentInfoByUsername(username)
     university = getUniInfoById(student.university_id)
     courses = getCoursesInfoByStudentId(student.id) 
+    if courses == None:
+        return generateResponse("Error getting courses", 401)
     return render_template('profile.html',
             username = username,
             name = student.name,
@@ -199,8 +255,9 @@ def profile(username):
 
 @app.route('/editprofile', methods = ['GET', 'POST'])
 def editProfile():
-    if login_session['username'] != username:
-        return flask.redirect(flask.url_for('profile', username = usernameInp))
+    if not ('username' in login_session):
+        return flask.redirect(flask.url_for('login'))
+    username = login_session['username']
     if request.method == 'GET':
         username = login_session['username']
         student = getStudentInfoByUsername(username)
@@ -214,13 +271,89 @@ def editProfile():
                 courses = courses)
     elif request.method == 'POST':
         nameInp = request.form['name']
-        courses = request.form.getList('course')
+        courses = request.form.getlist('course')
+        if nameInp == '':
+            student = getStudentInfoByUsername(username)
+            nameInp = student.name 
+        if updateStudentInfo(username, nameInp, courses):
+            print "Update profile successfully"
+        else:
+            print "Update profile failed"
         return flask.redirect(flask.url_for('profile', username = login_session['username']))
 
 @app.route('/dashboard', methods = ['GET', 'POST'])
 def dashboard():
     if not ('username' in login_session):
         return flask.redirect(flask.url_for('login'))
+    postedRequests = getYourRequests(username) 
+    openRequests = getRequestsForUser(username) 
+    workingRequests = getRequestsInProgress(username) 
+    return render_template('dashboard.html',
+            postedRequests = postedRequests,
+            openRequests = openRequests,
+            workingRequests = workingRequests)
+
+@app.route('/dashboard/accept', methods = ['POST'])
+def acceptRequest():
+    if not ('username' in login_session):
+        return flask.redirect(flask.url_for('login'))
+    requestId = request.form['request_id']
+    if updateRequestStatus(requestId, "PROGRESS", login_session['username']):
+        print "Update request successful"
+    else:
+        print "Update request failed"
+    return flask.redirect(flask.url_for('dashboard'))
+
+@app.route('/dashboard/cancel', methods = ['POST'])
+def declineRequest():
+    if not ('username' in login_session):
+        return flask.redirect(flask.url_for('login'))
+    requestId = request.form['request_id']
+    if updateRequestStatus(requestId, "OPEN", ""):
+        print "Update request successful"
+    else:
+        print "Update request failed"
+    return flask.redirect(flask.url_for('dashboard'))
+
+@app.route('/dashboard/delete', methods = ['POST'])
+def deleteRequest():
+    if not ('username' in login_session):
+        return flask.redirect(flask.url_for('login'))
+    requestId = request.form['request_id']
+    if deleteRequest(requestId):
+        print "Delete request successful"
+    else:
+        print "Delete request failed"
+    return flask.redirect(flask.url_for('dashboard'))
+
+@app.route('/requesthelp', methods = ['GET', 'POST'])
+def requestHelp():
+    if not ('username' in login_session):
+        return flask.redirect(flask.url_for('login'))
+    student = getStudentInfoByUsername(login_session['username'])
+    if request.method == 'GET':
+        courses = getCoursesInfoByStudentId(student.id)
+        return render_template('requesthelp.html', courses = courses)
+    elif request.method == 'POST':
+        subjectInp = request.form['subject']
+        descriptionInp = request.form['description']
+        locationInp = request.form['location']
+        courseInp = request.form['course']
+        dateTime = datetime.now()
+        if subjectInp == '' or locationInp == '' or courseInp:
+            return generateResponse('Please enter the required field', 401)
+        helpRequest = HelpRequest(
+                student_id = Student.id,
+                subject = subjectInp,
+                description = descriptionInp,
+                logout = locationInp,
+                course_id = courseInp,
+                status = "OPEN",
+                date = dateTime)
+        session.add(helpRequest)
+        session.commit()
+        return flask.redirect(flask.url_for('dashboard'))
+        
 
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
