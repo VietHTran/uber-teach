@@ -181,6 +181,20 @@ def deleteRequest(requestId):
     except:
         return False
 
+def closeRequest(requestId):
+    try:
+        req = session.query(HelpRequest).filter_by(id = requestId).one()
+        enrollment = session.query(Enrollment).filter_by(student_id = req.helper_id, id = req.course_id).one()
+        enrollment.credits += 1
+        session.commit()
+        if updateRequestStatus(requestId, "CLOSED", ""):
+            return True
+        return False 
+    except Exception as ex:
+        print "Close Request Error: "
+        print str(ex)
+        return False
+
 # Login page
 @app.route('/', methods = ['GET', 'POST'])
 @app.route('/login', methods = ['GET', 'POST'])
@@ -349,11 +363,22 @@ def acceptRequest():
     return flask.redirect(flask.url_for('dashboard'))
 
 @app.route('/dashboard/cancel', methods = ['POST'])
-def declineRequest():
+def cancelTutor():
     if not ('username' in login_session):
         return flask.redirect(flask.url_for('login'))
     requestId = request.form['request_id']
     if updateRequestStatus(requestId, "OPEN", ""):
+        print "Update request successful"
+    else:
+        print "Update request failed"
+    return flask.redirect(flask.url_for('dashboard'))
+
+@app.route('/dashboard/complete', methods = ['POST'])
+def completeTutoring():
+    if not ('username' in login_session):
+        return flask.redirect(flask.url_for('login'))
+    requestId = request.form['request_id']
+    if closeRequest(requestId):
         print "Update request successful"
     else:
         print "Update request failed"

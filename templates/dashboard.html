@@ -50,12 +50,25 @@ function displaySection(id) {
                     </div>
                 </div>
                 <div class="extra content">
+                    {% if pr.request.status == 'OPEN' %}
                     <div class="ui one buttons">
                         <form method="POST" action="{{ url_for('deleteRequestRoute') }}">
                             <input name="request_id" value="{{ pr.request.id }}" style="display: none">
                             <input class="ui basic red button" type="submit" value="Delete Request">
                         </form>
                     </div>
+                    {% elif pr.request.status == 'PROGRESS' %}
+                    <div class="ui two buttons">
+                        <form method="POST" action="{{ url_for('cancelTutor') }}">
+                            <input name="request_id" value="{{ pr.request.id }}" style="display: none">
+                            <input class="ui basic red button" type="submit" value="Cancel Tutor">
+                        </form>
+                        <form method="POST" action="{{ url_for('completeTutoring') }}">
+                            <input name="request_id" value="{{ pr.request.id }}" style="display: none">
+                            <input class="ui basic green button" type="submit" value="Tutoring Complete">
+                        </form>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
