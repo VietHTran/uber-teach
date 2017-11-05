@@ -1,5 +1,32 @@
 {% extends "layout.html" %}
 {% block content %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.css" rel="stylesheet" />
+    <nav class="ui borderless menu">
+        <div class = "ui container">
+            <div class = "left menu">
+                <a href="{{ url_for('dashboard') }}">
+                    <button class="ui left floated button">
+                        <i class = "homw icon"></i>Home
+                    </button>
+                </a>
+            </div>
+            <div class = "right menu">
+                <div class = "left menu">
+                    <a href="{{ url_for('profileDef') }}">
+                        <button class="ui left floated button">
+                            <i class = "user icon"></i>Profile
+                        </button>
+                    </a>
+                </div>
+                <div class = "left menu">
+                    <a href="{{ url_for('logout') }}">
+                        <button class="ui left floated button">
+                            <i class = "power icon"></i>Logout
+                        </button>
+                    </a>
+                </div>
+            </div>
+    </nav>
 <center>
     <form action="#" method="POST" style="display: inline-block">
         <h1 class="ui header">Send Help Request</h1>

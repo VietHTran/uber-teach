@@ -28,6 +28,32 @@ function onAddClick() {
     a.appendChild(newDiv);
 }
 </script>
+    <nav class="ui borderless menu">
+        <div class = "ui container">
+            <div class = "left menu">
+                <a href="{{ url_for('dashboard') }}">
+                    <button class="ui left floated button">
+                        <i class = "homw icon"></i>Home
+                    </button>
+                </a>
+            </div>
+            <div class = "right menu">
+                <div class = "left menu">
+                    <a href="{{ url_for('profileDef') }}">
+                        <button class="ui left floated button">
+                            <i class = "user icon"></i>Profile
+                        </button>
+                    </a>
+                </div>
+                <div class = "left menu">
+                    <a href="{{ url_for('logout') }}">
+                        <button class="ui left floated button">
+                            <i class = "power icon"></i>Logout
+                        </button>
+                    </a>
+                </div>
+            </div>
+    </nav>
 <div class = "ui grid">
     <div class = "four wide column">
         <img class = "ui small image" src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Profile_Icon.png">

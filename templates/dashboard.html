@@ -16,18 +16,30 @@ function displaySection(id) {
 }
 </script>
 
-<nav class="ui borderless menu">
-    <div class = "ui container">
-        <div class = "left menu"><button class="ui left floated button"><i class = "home icon"></i>Home</button></div>
-        <a class="item" onclick="displaySection('post')">Post Requests</a>
-        <a class="item" onclick="displaySection('your')">Your Requests</a>
-        <a class="item" onclick="displaySection('open')">Open Requests</a>
-        <a class="item" onclick="displaySection('working')">Working Requests</a>
-        <div class = "right menu">
-            <div class = "left menu"><button class="ui left floated button"><i class = "user icon"></i>Profile</button></div>
-            <div class = "left menu"><button class="ui left floated button"><i class = "power icon"></i>Logout</button></div>
-</div>
-</nav>
+    <nav class="ui borderless menu">
+        <div class = "ui container">
+            <div class = "left menu"><button class="ui left floated button"><i class = "home icon"></i>Home</button></div>
+            <a class="item" onclick="displaySection('post')">Post Requests</a>
+            <a class="item" onclick="displaySection('your')">Your Requests</a>
+            <a class="item" onclick="displaySection('open')">Open Requests</a>
+            <a class="item" onclick="displaySection('working')">Working Requests</a>
+            <div class = "right menu">
+                <div class = "left menu">
+                    <a href="{{ url_for('profileDef') }}">
+                        <button class="ui left floated button">
+                            <i class = "user icon"></i>Profile
+                        </button>
+                    </a>
+                </div>
+                <div class = "left menu">
+                    <a href="{{ url_for('logout') }}">
+                        <button class="ui left floated button">
+                            <i class = "power icon"></i>Logout
+                        </button>
+                    </a>
+                </div>
+            </div>
+    </nav>
 
 <center>
     <div id="post">

@@ -267,6 +267,26 @@ def logout():
         del login_session['username']
         return flask.redirect(flask.url_for('login'))
 
+@app.route('/profile')
+def profileDef():
+    if not ('username' in login_session):
+        return flask.redirect(flask.url_for('login'))
+    editBtnVisibility = 'collapse'
+    username = login_session['username']
+    editBtnVisibility = 'visible'
+    student = getStudentInfoByUsername(username)
+    university = getUniInfoById(student.university_id)
+    data = getEnrollmentByUsername(username)
+    if data == None:
+        return generateResponse("Error getting courses and enrollments", 401)
+    return render_template('profile.html',
+            username = username,
+            name = student.name,
+            email = student.email,
+            university = university.name,
+            data = data,
+            editBtnVisibility = editBtnVisibility)
+
 @app.route('/profile/<username>/')
 def profile(username):
     if not ('username' in login_session):
@@ -460,7 +480,8 @@ def requestHelp():
         return flask.redirect(flask.url_for('dashboard'))
         
 
-# app.secret_key = 'super_secret_key'
+app.secret_key = "\xed\x7f\x11&\xb9ce\xa9\x86\xec\xc4\x97\xe1\x8ey\x1br\xb9\x0en|QG\x80"
+
 if __name__ == '__main__':
     app.debug = True
     app.run(host = '0.0.0.0', port = 5000)
