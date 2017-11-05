@@ -11,8 +11,8 @@ httplib2==0.10.3
 itsdangerous==0.24
 Jinja2==2.9.6
 MarkupSafe==1.0
-matplotlib==1.5.2rc2
-mechanize==0.2.5
+
+
 mock==2.0.0
 numpy==1.11.3
 oauth2client==4.1.2
