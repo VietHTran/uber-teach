@@ -7,6 +7,7 @@ const SECTIONS = ["post", "your", "open", "working"];
 function displaySection(id) {
     if (id === "post") {
         window.location.href = "{{ url_for('requestHelp') }}"; 
+        return;
     }
     for (var i=0; i<SECTIONS.length; ++i) {
         document.getElementById(SECTIONS[i]).style.visibility = "collapse";
@@ -37,7 +38,9 @@ function displaySection(id) {
                         {{ pr.course.name }}
                     </div>
                     <div class="meta">
-                        By: {{ pr.student.username }}
+                        By: <a href="{{ url_for('profile', username = pr.student.username) }}">
+                            {{ pr.student.username }}
+                        </a>
                     </div>
                     <div class="description">
                         {{ pr.request.description }}
@@ -48,7 +51,10 @@ function displaySection(id) {
                 </div>
                 <div class="extra content">
                     <div class="ui one buttons">
-                        <div class="ui basic red button">Delete Request</div>
+                        <form method="POST" action="{{ url_for('deleteRequestRoute') }}">
+                            <input name="request_id" value="{{ pr.request.id }}" style="display: none">
+                            <input class="ui basic red button" type="submit" value="Delete Request">
+                        </form>
                     </div>
                 </div>
             </div>
@@ -72,15 +78,23 @@ function displaySection(id) {
                         {{ op.course.name }}
                     </div>
                     <div class="meta">
-                        By: {{ op.student.username }}
+                        By: <a href="{{ url_for('profile', username = op.student.username) }}">
+                            {{ op.student.username }}
+                        </a>
                     </div>
                     <div class="description">
                         {{ op.request.description }}
                     </div>
+                    <div class="meta">
+                        Status: {{ op.request.status }}
+                    </div>
                 </div>
                 <div class="extra content">
                     <div class="ui one buttons">
-                        <div class="ui basic green button">Accept Request</div>
+                        <form method="POST" action="{{ url_for('acceptRequest') }}">
+                            <input name="request_id" value="{{ op.request.id }}" style="display: none">
+                            <input class="ui basic green button" type="submit" value="Accept Request">
+                        </form>
                     </div>
                 </div>
             </div>
@@ -101,6 +115,11 @@ function displaySection(id) {
                     </div>
                     <div class="meta">
                         {{ wkr.course.name }}
+                    </div>
+                    <div class="meta">
+                        Requester: <a href="{{ url_for('profile', username = wkr.student.username) }}">
+                            {{ wkr.student.username }}
+                        </a>
                     </div>
                     <div class="description">
                         {{ wkr.request.description }}

@@ -163,9 +163,9 @@ def getRequestsInProgress(username):
 def updateRequestStatus(requestId, status, username):
     try:
         request = session.query(HelpRequest).filter_by(id = requestId).one()
-        student = session.query(Student).filter_by(username = username).one()
         request.status = status
         if status == 'PROGRESS':
+            student = session.query(Student).filter_by(username = username).one()
             request.helper_id = student.id
         session.commit()
         return True
@@ -323,7 +323,6 @@ def dashboard():
                 'course': getCourseInfoById(orq.course_id)
                 }
         opn.append(holder)
-
     working = []
     workingRequests = getRequestsInProgress(username) 
     for wr in workingRequests:
@@ -332,8 +331,7 @@ def dashboard():
                 'student': getStudentInfoById(wr.student_id),
                 'course': getCourseInfoById(wr.course_id)
                 }
-        wr.append(holder)
-
+        working.append(holder)
     return render_template('dashboard.html',
             posted= posted,
             opn= opn,
@@ -362,7 +360,7 @@ def declineRequest():
     return flask.redirect(flask.url_for('dashboard'))
 
 @app.route('/dashboard/delete', methods = ['POST'])
-def deleteRequest():
+def deleteRequestRoute():
     if not ('username' in login_session):
         return flask.redirect(flask.url_for('login'))
     requestId = request.form['request_id']
