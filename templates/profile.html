@@ -5,14 +5,6 @@
 <div class = "ui grid">
     <div class = "two wide column">
         <img class = "ui small image" src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Profile_Icon.png">
-        <div class="courses">
-            <h3>Courses: </h3>
-            <ul>
-                {% for course in courses %}
-                <li>{{ course.name }}</li>
-                {% endfor %}
-            </ul>
-        </div>
     </div>
     <div class = "eight wide column">
 
@@ -34,6 +26,14 @@
                 <div class="content">
                     <a href="mailto:{{ email }}">{{ email }}</a>
                 </div>
+            </div>
+            <div class="item">
+                <h3>Courses: </h3>
+                <ul>
+                    {% for i in data %}
+                    <li>{{ i.course.name }} ({{ i.credits }} credits)</li>
+                    {% endfor %}
+                </ul>
             </div>
             <div class="item" style="visibility: {{ editBtnVisibility }}">
                 <form action="{{ url_for('editProfile') }}">
